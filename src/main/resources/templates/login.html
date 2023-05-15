@@ -6,7 +6,7 @@
   <style>
     body {
       background-color: #1d282c;
-      /*background-image: url("/templates/images/background-image.jpg");*/
+      /*background-image: url("/static/background-image.jpg");*/
       background-size: cover;
       background-position: center;
       font-family: Arial, sans-serif;
@@ -36,7 +36,7 @@
     }
 
     .form-group input {
-      width: 100%;
+      width: 93%;
       padding: 5px;
       font-size: 16px;
       border-radius: 3px;
@@ -70,6 +70,10 @@
       <div class="form-group">
         <button type="submit">Login</button>
         <p></p>
+      </div>
+    </form>
+    <form th:action="@{/registration}" method="get" >
+      <div class="form-group">
         <button type="submit" th:href="@{/registration}" >Registration</button>
       </div>
     </form>

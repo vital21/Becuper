@@ -1,42 +1,48 @@
 package com.example.alhohelp.config;
 
+import com.example.alhohelp.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
 
+import static org.springframework.security.crypto.password.NoOpPasswordEncoder.getInstance;
+
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig {
-    DataSource dataSource;
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    private UserService userService;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
         http
-
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/","login","/registration" ,"/upload", "/home","/templates/images/**","/upload-dir/**","C:/upload","/files").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin((form) -> form
-                        .loginPage("/login")
-                        .permitAll()
-                )
-                .logout((logout) -> logout.permitAll());
-
-        return http.build();
+                .authorizeRequests()
+                    .antMatchers("/", "/login", "/registration", "/upload", "/home", "C:/upload").permitAll()
+                    .anyRequest().authenticated()
+                .and()
+                    .formLogin()
+                    .loginPage("/login")
+                    .permitAll()
+                .and()
+                    .logout()
+                    .permitAll();
     }
 
 
-   /* @Bean
-    public void Configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.jdbcAuthentication()
-                .dataSource(dataSource)
-                .passwordEncoder(NoOpPasswordEncoder.getInstance())
-                .usersByUsernameQuery("select username, password, active from t_user where username = ?")
-                .authoritiesByUsernameQuery("select u.username, ur.roles from t_user u inner join user_role ur on u.id = ur.user_id where u.username=?");
-    }*/
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+       auth.userDetailsService(userService).passwordEncoder(getInstance());
+    }
 }
 
