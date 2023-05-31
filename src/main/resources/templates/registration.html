@@ -5,8 +5,7 @@
   <title>Login Page</title>
   <style>
     body {
-      background-color: #1d282c;
-      /*background-image: url("/templates/images/background-image.jpg");*/
+      background-image: url("/static/background-image.jpg");
       background-size: cover;
       background-position: center;
       font-family: Arial, sans-serif;
@@ -72,7 +71,7 @@
       </div>
     </form>
     <form th:action="@{/registration}" method="post">
-      <div class="form-group" th:each="mess:${message}"><p th:text="${mess}">hello</p>
+      <div class="form-group" th:each="mess:${message}"><p th:text="${mess}"></p>
       </div>
     </form>
 

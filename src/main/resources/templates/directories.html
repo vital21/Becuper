@@ -95,6 +95,11 @@
       <button type="button" class="btn btn-outline-success">Загрузить файлы</button>
     </a>
   </div>
+  <div class="col-md-1">
+    <a href="/dirBack" >
+      <button type="button" class="btn btn-outline-success" >Назад</button>
+    </a>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE" crossorigin="anonymous"></script>
@@ -126,30 +131,41 @@
 
     for (var i = 0; i < fileButtons.length; i++) {
       var fileButton = fileButtons[i];
-var fileName = fileButton.textContent.toLowerCase();
-var listItem = fileButton.parentNode;
+      var fileName = fileButton.textContent.toLowerCase();
+      var listItem = fileButton.parentNode;
 
-if (fileName.includes(filter)) {
-listItem.style.display = "";
-} else {
-listItem.style.display = "none";
-}
-}
+      if (fileName.includes(filter)) {
+        listItem.style.display = "";
+      } else {
+        listItem.style.display = "none";
+      }
+    }
 
-var folderButtons = document.querySelectorAll("#accordions .btn.btn-dark.bg-dark");
+    var folderButtons = document.querySelectorAll("#accordions .btn.btn-dark.bg-dark");
 
-for (var j = 0; j < folderButtons.length; j++) {
-var folderButton = folderButtons[j];
-var folderName = folderButton.textContent.toLowerCase();
-var folderListItem = folderButton.parentNode;
+    for (var j = 0; j < folderButtons.length; j++) {
+      var folderButton = folderButtons[j];
+      var folderName = folderButton.textContent.toLowerCase();
+      var folderListItem = folderButton.parentNode;
 
-if (folderName.includes(filter)) {
-folderListItem.style.display = "";
-} else {
-folderListItem.style.display = "none";
-}
-}
-}
+      if (folderName.includes(filter)) {
+        folderListItem.style.display = "";
+      } else {
+        folderListItem.style.display = "none";
+      }
+    }
+  }
 </script>
+<script>function goBack() {
+  window.history.back();
+}</script>
+<script>
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+</script>
+
 </body>
 </html>
