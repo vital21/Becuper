@@ -41,8 +41,17 @@ public class RegistratoinController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         Path uploadDir = Path.of(UPLOAD_DIR+"/"+user.getUsername());
+        Path uploadDirFile = Path.of(UPLOAD_DIR+"/"+user.getUsername()+"/"+"Files");
+        Path uploadDirDir = Path.of(UPLOAD_DIR+"/"+user.getUsername()+"/"+"Dir");
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
+        }
+
+        if (!Files.exists(uploadDirFile)) {
+            Files.createDirectories(uploadDirFile);
+        }
+        if (!Files.exists(uploadDirDir)) {
+            Files.createDirectories(uploadDirDir);
         }
         return "redirect:/login";
     }

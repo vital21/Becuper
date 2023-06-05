@@ -22,9 +22,7 @@
     </form>
     <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-link active" aria-current="page" href="/hello">Главная</a>
-        <a class="nav-link" href="/upload">Загрузка файлов</a>
-        <a class="nav-link" href="/files">Просмотр файлов</a>
+        <a class="nav-link active" aria-current="page" href="/files">Главная</a>
         <a class="nav-item mt-1" >
           <form th:action="@{/logout}" method="post">
             <input class="btn btn-outline-success" type="submit" value="Sign Out"/>
@@ -37,65 +35,76 @@
 
 <div class="row">
   <h1>Загруженные файлы</h1>
+  <span th:each="paths : ${path}" th:text="${paths}"></span>
   <div class="col-md-3">
 
-    <div id="accordion">
+
       <ul>
+
+        <div id="accordions">
+          <li th:each="dir,state : ${dirs}">
+            <img src="/static/free-icon-file-and-folder-8291136.png"  alt="Folder Icon" class="folder-icon" style="max-width: 30px; max-height: 30px;">
+            <button class="btn flex-fill" type="button" th:text="${dir}" data-bs-toggle="collapse" th:data-bs-target="'#dir-' + ${state.index}" aria-expanded="false" th:aria-controls="'dir-' + ${state.index}" style="font-weight: bold;" >
+            </button>
+            <div class="collapse multi-collapse" th:id="'dir-' + ${state.index}" th:data-bs-parent="'#accordions'">
+              <div class="card card-body ">
+                <form th:action="files" method="post">
+                  <a class="nav-link" href="/dirOpen/{dirName}" th:href="@{'/dirOpen/' + ${dir}}">Открыть</a>
+                </form>
+                <form th:action="files" method="post">
+                  <a class="nav-link" href="/downloadDirs/{dirName}" th:href="@{'/downloadDirs/' + ${dir}}">Скачать</a>
+                </form>
+                <form th:action="files" method="post">
+                  <a class="nav-link" href="/dirDelete/{dirName}" th:href="@{'/dirDelete/'+${dir}}">Удалить</a>
+                </form>
+              </div>
+            </div>
+          </li>
+        </div>
+        <div id="accordion">
         <li th:each="file,state : ${files}">
-          <button class="btn btn-dark bg-dark" type="button" th:text="${file}" data-bs-toggle="collapse" th:data-bs-target="'#file-' + ${state.index}" aria-expanded="false" th:aria-controls="'file-' + ${state.index}">
+          <button class="btn flex-fill" type="button" th:text="${file}" data-bs-toggle="collapse" th:data-bs-target="'#file-' + ${state.index}" aria-expanded="false" th:aria-controls="'file-' + ${state.index}">
           </button>
           <div class="collapse multi-collapse" th:id="'file-' + ${state.index}" th:data-bs-parent="'#accordion'">
             <div class="card card-body ">
               <form th:action="files" method="post">
-                <a class="nav-link" href="/filesVersions/{fileName}" th:href="@{'/filesVersions/' + ${file}}">Просмотреть версии</a>
+                <a class="nav-link" href="/filesInDirDownload/{fileName}" th:href="@{'/filesInDirDownload/' + ${file}}">Скачать</a>
               </form>
               <form th:action="files" method="post">
-                <a class="nav-link" href="/files1/{fileName}" th:href="@{'/files1/' + ${file}}">Скачать последнюю версию</a>
-              </form>
-              <form th:action="files" method="post">
-                <a class="nav-link" href="/filesDelete/{fileName}" th:href="@{'/filesDelete/'+${file}}">Удалить</a>
+                <a class="nav-link" href="/filesInDirDelete/{fileName}" th:href="@{'/filesInDirDelete/'+${file}}">Удалить</a>
               </form>
             </div>
           </div>
         </li>
+
+        </div>
       </ul>
     </div>
-  </div>
+
 
   <div class="col-md-3">
-    <div id="accordions">
+
       <ul>
-        <li th:each="dir,state : ${dirs}">
-          <button class="btn btn-dark bg-dark" type="button" th:text="${dir}" data-bs-toggle="collapse" th:data-bs-target="'#dir-' + ${state.index}" aria-expanded="false" th:aria-controls="'dir-' + ${state.index}">
-          </button>
-          <div class="collapse multi-collapse" th:id="'dir-' + ${state.index}" th:data-bs-parent="'#accordions'">
-            <div class="card card-body ">
-              <form th:action="files" method="post">
-                <a class="nav-link" href="/dirOpen/{dirName}" th:href="@{'/dirOpen/' + ${dir}}">Открыть</a>
-              </form>
-              <form th:action="files" method="post">
-                <a class="nav-link" href="/files1/{dirName}" th:href="@{'/files1/' + ${dir}}">шо-то</a>
-              </form>
-              <form th:action="files" method="post">
-                <a class="nav-link" href="/dirDelete/{dirName}" th:href="@{'/dirDelete/'+${dir}}">Удалить</a>
-              </form>
-            </div>
-          </div>
-        </li>
+
       </ul>
-    </div>
+
   </div>
-  <div class="col-md-1">
-    <a href="/newDir">
-      <button type="button" class="btn btn-outline-success">Создать папку</button>
-    </a>
+  <div class="col-md-2  ">
+    <form th:action="@{/newDir}" method="post">
+      <div class="input-group">
+        <input type="text" class="form-control" placeholder="Имя папки" aria-label="Recipient's username" aria-describedby="button-addon2" name="FolderName">
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-outline-success" id="button-addon2">Создать папку</button>
+        </div>
+      </div>
+    </form>
   </div>
-  <div class="col-md-1">
-    <a href="/upload">
-      <button type="button" class="btn btn-outline-success">Загрузить файлы</button>
-    </a>
+
+  <div class="col-md-1  ">
+    <a href="/uploadFilesInFolder" class="btn btn-outline-success">Загрузить файлы</a>
   </div>
-  <div class="col-md-1">
+
+  <div class="col-md-2">
     <a href="/dirBack" >
       <button type="button" class="btn btn-outline-success" >Назад</button>
     </a>

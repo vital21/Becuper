@@ -25,9 +25,7 @@
                 <div class="dashboard_rules" sec:authorize="hasAuthority('ADMIN')">
                     <a class="nav-link active"  href="/admin/users">Главная для админа</a>
                 </div>
-                <a class="nav-link active"  aria-current="page" href="/hello" >Главная</a>
-                <a class="nav-link" href="/upload">Загрузка файлов</a>
-                <a class="nav-link" href="/files">Просмотр файлов</a>
+                <a class="nav-link active"  aria-current="page" href="/files" >Главная</a>
                 <a class="nav-item mt-1" >
                     <form th:action="@{/logout}" method="post">
                         <input type="submit" value="Sign Out"/>
@@ -46,15 +44,21 @@
     <div class="row mb-3">
         <label for="inputLogin" class="col-sm-2 col-form-label">Логин</label>
         <div class="col-sm-3">
-            <input type="text" class="form-control" id="inputLogin" name="newUserName">
+            <input type="text" class="form-control" id="inputLogin" name="newUserName" required pattern=".{1,}">
         </div>
     </div>
-    <div class="row mb-3">
-        <label for="inputPassword3" class="col-sm-2 col-form-label">Пароль</label>
-        <div class="col-sm-3">
-            <input type="password" class="form-control" id="inputPassword3" name="password">
+    <fieldset class="row mb-3">
+        <legend class="col-form-label col-sm-2 pt-0">Пароль</legend>
+        <div class="col-sm-10">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="isButtonPressed" value="true" id="passUser">
+                <label class="form-check-label" for="passUser">
+                    Сброс пароля
+                </label>
+            </div>
         </div>
-    </div>
+    </fieldset>
+
     <fieldset class="row mb-3">
         <legend class="col-form-label col-sm-2 pt-0">Роль</legend>
         <div class="col-sm-10">
@@ -72,19 +76,28 @@
             </div>
         </div>
     </fieldset>
-    <button type="submit" name="userName" th:value="${users.username}" class="btn btn-primary">Изменить</button>
+    <button type="submit"  class="btn btn-outline-success" name="userName" th:value="${users.username}">Изменить</button>
 </form>
-        <form method="post" th:action="@{deleteUser}" th:each = "users:${user}">
-            <input type="hidden" name="userId" th:value="${users.id}" />
-            <button type="submit" class="btn btn-danger">Удалить пользователя</button>
-        </form>
-    </div>
-    <div class="col-md-6" th:each = "users:${user}">
+
+
+    </div >
+    <div class="col-md-6">
+    <div  th:each = "users:${user}">
         <h3>Данные пользователя</h3>
         <p th:text = "@{'Логин: ' + ${users.username}}" style="margin-bottom: 10px;" ></p>
         <p th:text = "@{'Пароль: ' + ${users.password}}"></p>
         <p th:text = "@{'Роль: ' + ${users.roles}}"></p>
+
     </div>
+        <div th:each = "sizes:${size}">
+            <p th:text="@{'Занимаемая память: ' + ${sizes} + 'МБ'}"></p>
+        </div>
+        <form method="post" th:action="@{deleteUser}" th:each = "users:${user}">
+            <input type="hidden" name="userId" th:value="${users.id}" />
+            <button type="submit" class="btn btn-outline-success">Удалить пользователя</button>
+        </form>
+    </div>
+
 </div>
 
 

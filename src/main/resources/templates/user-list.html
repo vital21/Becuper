@@ -22,9 +22,7 @@
     </form>
     <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-link active" aria-current="page" href="/hello">Главная</a>
-        <a class="nav-link" href="/upload">Загрузка файлов</a>
-        <a class="nav-link" href="/files">Просмотр файлов</a>
+        <a class="nav-link active" aria-current="page" href="/files">Главная</a>
         <a class="nav-item mt-1" >
           <form th:action="@{/logout}" method="post">
             <input class="btn btn-outline-success" type="submit" value="Sign Out"/>
@@ -57,10 +55,6 @@
       <form th:action="@{usersRedact}" method="post">
         <input type="hidden" >
         <button class="btn btn-outline-success w-100 p-2 mb-2" name="userName" th:value="${user.username}" type="submit" >Редактировать</button>
-      </form>
-      <form th:action="@{usersinformation}" method="post">
-        <input type="hidden">
-        <button class="btn btn-outline-success w-100 p-2 " name="userName" th:value="${user.username}" type="submit" >Информация</button>
       </form>
     </td>
   </tr>

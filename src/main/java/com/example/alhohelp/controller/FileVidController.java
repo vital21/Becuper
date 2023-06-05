@@ -1,5 +1,4 @@
 package com.example.alhohelp.controller;
-
 import com.example.alhohelp.entity.User;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.core.io.FileSystemResource;
@@ -19,9 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriUtils;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +27,10 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Controller
 public class FileVidController {
@@ -44,76 +43,17 @@ public class FileVidController {
         model.addAttribute("files", files);
         File dirFolder = new File(UPLOAD_DIR+"/"+user.getUsername()+"/Dir");
         List<String> dirs = Arrays.asList(dirFolder.list());
+        if(user.getRoles().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"))){
+            model.addAttribute("isAdmin",true);
+        }
+        else {
+            model.addAttribute("isAdmin",false);
+        }
         model.addAttribute("dirs",dirs);
+        model.addAttribute("path",UPLOAD_DIRECTORIES + "/" + user.getUsername() + "/Dir");
         session.setAttribute("uploadDirectory", UPLOAD_DIRECTORIES + "/" + user.getUsername() + "/Dir");
         return "file-list";
     }
-    @GetMapping("/dirOpen/{dirName}")
-    public String dirOpen(Model model, @PathVariable String dirName, @AuthenticationPrincipal User user , HttpSession session, HttpServletResponse response){
-        String uploadDirectory = (String) session.getAttribute("uploadDirectory");
-            uploadDirectory = uploadDirectory + "/" + dirName;
-            List<String> folderNames = new ArrayList<>();
-            List<String> fileNames = new ArrayList<>();
-
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            File directory = new File(uploadDirectory);
-
-
-            if (directory.isDirectory()) {
-
-                File[] files = directory.listFiles();
-
-
-                if (files != null) {
-                    for (File file : files) {
-                        if (file.isDirectory()) {
-                            folderNames.add(file.getName());
-                        } else {
-                            fileNames.add(file.getName());
-                        }
-                    }
-                }
-            }
-
-         model.addAttribute("dirs",folderNames);
-            model.addAttribute("files",fileNames);
-        session.setAttribute("uploadDirectory", uploadDirectory);
-        return "directories";
-    }
-    @GetMapping("/dirBack")
-    public String dirBack(Model model, @AuthenticationPrincipal User user, HttpSession session) {
-        String uploadDirectory = (String) session.getAttribute("uploadDirectory");
-        int lastIndex = uploadDirectory.lastIndexOf("/");
-        uploadDirectory = uploadDirectory.substring(0, lastIndex);
-        if(uploadDirectory.equals(UPLOAD_DIR+"/"+user.getUsername()+"/Dir")){
-            return "redirect:/files";
-        }
-        List<String> folderNames = new ArrayList<>();
-        List<String> fileNames = new ArrayList<>();
-        File directory = new File(uploadDirectory);
-
-
-        if (directory.isDirectory()) {
-
-            File[] files = directory.listFiles();
-
-
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        folderNames.add(file.getName());
-                    } else {
-                        fileNames.add(file.getName());
-                    }
-                }
-            }
-        }
-        model.addAttribute("dirs", folderNames);
-        model.addAttribute("files", fileNames);
-        session.setAttribute("uploadDirectory", uploadDirectory);
-        return "directories";
-    }
-
     @GetMapping("/filesVersions/{fileName}")
     public String getFileVersions(Model model,@PathVariable String fileName, @AuthenticationPrincipal User user){
         File folder = new File(UPLOAD_DIR+"/"+user.getUsername()+"/Files"+"/"+fileName);
@@ -121,7 +61,6 @@ public class FileVidController {
         model.addAttribute("files", files);
         return "file-version-list";
     }
-
     @GetMapping("/file/{fileName}")
     public ResponseEntity<Resource> downloadFile(@PathVariable String fileName, @AuthenticationPrincipal User user) {
         String cleanedFilename;
@@ -182,43 +121,6 @@ public class FileVidController {
 
         return "upload";
     }
-    @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile[] files,
-                             @RequestParam("directoriesName") String directoriesName,
-                             @AuthenticationPrincipal User user,
-                             RedirectAttributes redirectAttributes) {
-
-        if (files != null && files.length > 0) {
-            try {
-                // Определите путь сохранения на сервере
-                String uploadPath = "/path/to/upload/directory/";
-
-                for (MultipartFile file : files) {
-                    if (!file.isEmpty()) {
-                        // Получите имя файла
-                        String fileName = file.getOriginalFilename();
-
-                        // Создайте путь к файлу
-                        String filePath = uploadPath + fileName;
-
-                        // Сохраните файл на сервере
-                        file.transferTo(new File(filePath));
-
-                        // Дополнительные действия после сохранения файла
-                        // ...
-                    }
-                }
-
-                return "success";
-            } catch (IOException e) {
-                // Обработка ошибки
-                return "error";
-            }
-        } else {
-            // Файлы не выбраны
-            return "redirect:/upload";
-        }
-    }
 
     @PostMapping("/uploadFiles")
     public String uploadFiles(@RequestParam("file") MultipartFile file,
@@ -250,11 +152,11 @@ public class FileVidController {
             }
             Path targetLocation = uploadCopyFile.resolve(newFileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-            redirectAttributes.addFlashAttribute("message", "File uploaded successfully");
+            redirectAttributes.addFlashAttribute("message", "Файл успешно загружен");
         } catch (IOException ex) {
             ex.printStackTrace();
 
-            redirectAttributes.addFlashAttribute("message", "Failed to upload file");
+            redirectAttributes.addFlashAttribute("message", "Ошибка загрузки");
         }
         return "redirect:/upload";
     }
@@ -318,4 +220,8 @@ public class FileVidController {
         return files.get(0);
     }
 
+
+
 }
+
+

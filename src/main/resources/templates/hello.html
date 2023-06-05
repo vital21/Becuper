@@ -25,7 +25,7 @@
         <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
             <div class="navbar-nav">
 
-                <div class="dashboard_rules" sec:authorize="hasAuthority('ADMIN')">
+                <div class="dashboard_rules" sec:authorize="hasAuthority('ROLE_ADMIN')">
                     <a class="nav-link active"  href="/admin/users">Главная для админа</a>
                 </div>
                 <a class="nav-link active"  aria-current="page" href="/hello" >Главная</a>

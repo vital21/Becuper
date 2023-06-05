@@ -8,6 +8,6 @@ import java.util.Set;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String name);
-    User findAllByUsernameNotNull();
+    User findById(int id);
     void deleteById(Long id);
 }
