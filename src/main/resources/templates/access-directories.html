@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+</body>
+</html><!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
@@ -8,6 +26,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+
   <div class="container-fluid ">
     <div class="container">
       <a class="navbar-brand" href="#">
@@ -17,7 +36,7 @@
     </div>
     <form class="d-flex" role="search" onsubmit="return false;">
       <input class="form-control me-2" type="search" id="searchInput" placeholder="Поиск файла" aria-label="Search">
-      <button class="btn btn-outline-success" type="button" onclick="searchFiles()">Поиск</button>
+      <button class="btn btn-outline-success" type="button" onclick="searchFiles()">Search</button>
     </form>
     <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
       <div class="navbar-nav">
@@ -31,40 +50,30 @@
     </div>
   </div>
 </nav>
+
 <div class="row">
-  <h1>Загруженные файлы</h1>
+  <h1>Файлы общего доступа</h1>
   <span th:each="paths : ${path}" th:text="${paths}"></span>
   <div class="col-md-5">
     <ul>
       <div id="accordions">
         <li th:each="dir,state : ${dirs}">
           <div th:id="'target-'+${dir}">
-            <img src="/static/free-icon-file-and-folder-8291136.png" alt="Folder Icon" class="folder-icon" style="max-width: 30px; max-height: 30px;">
-            <button class="btn flex-fill" type="button" th:text="${dir}" data-bs-toggle="collapse" th:data-bs-target="'#dir-' + ${state.index}" aria-expanded="false" th:aria-controls="'dir-' + ${state.index}" style="font-weight: bold;"></button>
+          <img src="/static/free-icon-file-and-folder-8291136.png" alt="Folder Icon" class="folder-icon" style="max-width: 30px; max-height: 30px;">
+          <button class="btn flex-fill" type="button" th:text="${dir}" data-bs-toggle="collapse" th:data-bs-target="'#dir-' + ${state.index}" aria-expanded="false" th:aria-controls="'dir-' + ${state.index}" style="font-weight: bold;"></button>
           </div>
           <div class="collapse multi-collapse" th:id="'dir-' + ${state.index}" th:data-bs-parent="'#accordions'">
             <div class="card card-body">
-
               <form th:action="files" method="post">
-                <a class="nav-link" href="/downloadDirs/{dirName}" th:href="'/downloadDirs/' + ${dir}" th:download="'/downloadDirs/' + ${dir}" onclick="return confirmDownload(event,this.getAttribute('download'), this.getAttribute('data-download'))" th:data-download="${prov}">
+                <a class="nav-link" href="/downloadDirs/{dirName}" th:href="'/downloadAccessDirs/' + ${dir}" onclick="return confirmDownload(event,this.getAttribute('download'), this.getAttribute('data-download'))" th:data-download="${prov}">
                   Скачать
                 </a>
               </form>
-              <form th:action="files" method="post">
-                <a class="nav-link" href="#" th:atribute = "${dir}" onclick="confirmDelete(event, this.getAttribute('atribute'))">Удалить</a>
-              </form>
-              <a class="nav-link" href="#" th:data-access-form="${dir}" onclick="showAccessForm(event, this.getAttribute('data-access-form'))">Предоставить доступ</a>
-              <div th:id="'accessFormContainer-'+${dir}" style="display: none;">
-                <form th:action="@{'/filesAccess/' + ${dir}}" method="post">
-                  <input type="text" name="username" placeholder="Имя пользователя">
-                  <button type="submit" class="btn btn-outline-success" th:formaction="'/filesAccess/' + ${dir}">Подтвердить</button>
-                </form>
-              </div>
               <a class="nav-link" href="#"  th:data-access-form="${dir}"  onclick="showAccessFormTwo(event,  this.getAttribute('data-access-form'))">
                 Информация
               </a>
-              <div th:id="${dir}" style="display: none;">
-                <div style="margin-top: 5px;">Дата создания: <span th:text="${folderDate[state.index]}"></span></div>
+              <div th:id="${dir}" style="display: none; ">
+                <div style="margin-top: 5px;">Дата загрузки: <span th:text="${folderDate[state.index]}"></span></div>
                 <div style="margin-top: 5px;">Размер: <span th:text="${folderSize[state.index]}"></span> KB</div>
               </div>
             </div>
@@ -77,51 +86,31 @@
           <div class="collapse multi-collapse" th:id="'file-' + ${state.index}" th:data-bs-parent="'#accordion'">
             <div class="card card-body">
               <form th:action="files" method="post">
-                <a class="nav-link" href="/filesInDirDownload/{fileName}" th:href="@{'/filesInDirDownload/' + ${file}}" th:download="'/filesInDirDownload/' + ${file}" onclick="return confirmDownloadFile(event, this.getAttribute('download'), this.getAttribute('data-download'))" th:data-download="${prov}">Скачать</a>
+                <a class="nav-link" href="/filesInAccessDownload/{fileName}" th:href="@{'/filesInAccessDownload/' + ${file}}" >Скачать</a>
               </form>
-              <form th:action="files" method="post">
-                <a class="nav-link" href="#" th:atribute = "${file}" onclick="confirmDeleteFile(event, this.getAttribute('atribute'))">Удалить</a>
-              </form>
-              <a class="nav-link" href="#" th:data-access-form="${file}" onclick="showAccessForm(event, this.getAttribute('data-access-form'))">Предоставить доступ</a>
-              <div th:id="'accessFormContainer-'+${file}" style="display: none;">
-                <form th:action="@{'/filesAccess/' + ${file}}" method="post">
-                  <input type="text" name="username" placeholder="Имя пользователя">
-                  <button type="submit" class="btn btn-outline-success" th:formaction="'/filesAccess/' + ${file}">Подтвердить</button>
-                </form>
-              </div>
               <a class="nav-link" href="#"  th:data-access-form="${file}"  onclick="showAccessFormTwo(event,  this.getAttribute('data-access-form'))">
                 Информация
               </a>
               <div th:id="${file}" style="display: none;">
-                <div style="margin-top: 5px;">Дата загрузки: <span th:text="${fileDate[state.index]}"></span></div>
+                <div style="margin-top: 5px; ">Дата изменения: <span th:text="${fileDate[state.index]}"></span></div>
                 <div style="margin-top: 5px;">Размер: <span th:text="${fileSize[state.index]}"></span> KB</div>
               </div>
             </div>
           </div>
-
         </li>
       </div>
     </ul>
   </div>
+
+
   <div class="col-md-1">
-      <ul>
-      </ul>
+    <ul>
+    </ul>
   </div>
-  <div class="col-md-2  ">
-    <form th:action="@{/newDir}" method="post">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Имя папки" aria-label="Recipient's username" aria-describedby="button-addon2" name="FolderName">
-        <div class="input-group-append">
-          <button type="submit" class="btn btn-outline-success" id="button-addon2">Создать папку</button>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="col-md-1  ">
-    <a href="/uploadFilesInFolder" class="btn btn-outline-success">Загрузить файлы</a>
-  </div>
+
+
   <div class="col-md-2">
-    <a href="/dirBack" >
+    <a href="/dirBackAccess" >
       <button type="button" class="btn btn-outline-success" >Назад</button>
     </a>
   </div>
@@ -150,6 +139,40 @@
   }
 </script>
 <script>
+  function searchFiles() {
+    var input = document.getElementById("searchInput");
+    var filter = input.value.toLowerCase();
+    var fileButtons = document.querySelectorAll(".btn.btn-dark.bg-dark");
+
+    for (var i = 0; i < fileButtons.length; i++) {
+      var fileButton = fileButtons[i];
+      var fileName = fileButton.textContent.toLowerCase();
+      var listItem = fileButton.parentNode;
+
+      if (fileName.includes(filter)) {
+        listItem.style.display = "";
+      } else {
+        listItem.style.display = "none";
+      }
+    }
+
+    var folderButtons = document.querySelectorAll("#accordions .btn.btn-dark.bg-dark");
+
+    for (var j = 0; j < folderButtons.length; j++) {
+      var folderButton = folderButtons[j];
+      var folderName = folderButton.textContent.toLowerCase();
+      var folderListItem = folderButton.parentNode;
+
+      if (folderName.includes(filter)) {
+        folderListItem.style.display = "";
+      } else {
+        folderListItem.style.display = "none";
+      }
+    }
+  }
+</script>
+
+<script>
   function confirmDownload(event, downloadUrl, canDownload) {
     if (canDownload === 'false') {
       event.preventDefault(); // Отменяем переход по ссылке
@@ -170,6 +193,16 @@
       }
     }
   }
+</script>
+<script>function goBack() {
+  window.history.back();
+}</script>
+<script>
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
 </script>
 <script>
   function showAccessForm(event, formId) {
@@ -194,35 +227,16 @@
   }
 </script>
 <script>
-  function confirmDelete(event, fileName) {
-    event.preventDefault(); // Отменить стандартное действие ссылки
-
-    if (confirm('Вы уверены, что хотите удалить файл "' + fileName + '"?')) {
-      // Если пользователь нажал "ОК", выполнить удаление
-      window.location.href = '/dirDelete/' + fileName;
-    }
-  }
-</script>
-<script>
-  function confirmDeleteFile(event, fileName) {
-    event.preventDefault(); // Отменить стандартное действие ссылки
-
-    if (confirm('Вы уверены, что хотите удалить файл "' + fileName + '"?')) {
-      // Если пользователь нажал "ОК", выполнить удаление
-      window.location.href = '/filesInDirDelete/' + fileName;
-    }
-  }
-</script>
-<script>
   document.addEventListener('DOMContentLoaded', function() {
     var targetElements = document.querySelectorAll('[id^="target-"]');
     targetElements.forEach(function(element) {
       element.addEventListener('dblclick', function() {
         var dir = this.querySelector('button').textContent;
-        window.location.href = '/dirOpen/' + dir;
+        window.location.href = '/dirOpenAccess/' + dir;
       });
     });
   });
 </script>
+
 </body>
 </html>

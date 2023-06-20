@@ -39,6 +39,7 @@ public class RegistratoinController {
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setSecurityHes("hes");
         userRepository.save(user);
         Path uploadDir = Path.of(UPLOAD_DIR+"/"+user.getUsername());
         Path uploadDirFile = Path.of(UPLOAD_DIR+"/"+user.getUsername()+"/"+"Files");

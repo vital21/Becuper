@@ -18,7 +18,7 @@
     </div>
     <form class="d-flex" role="search" onsubmit="return false;">
       <input class="form-control me-2" type="search" id="searchInput" placeholder="Поиск файла" aria-label="Search">
-      <button class="btn btn-outline-success" type="button" onclick="searchFiles()">Search</button>
+      <button class="btn btn-outline-success" type="button" onclick="searchFiles()">Поиск</button>
     </form>
     <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
       <div class="navbar-nav">
@@ -26,7 +26,7 @@
         <a class="nav-link" href="/upload">Загрузка файлов</a>
         <a class="nav-item mt-1" >
           <form th:action="@{/logout}" method="post">
-            <input class="btn btn-outline-success" type="submit" value="Sign Out"/>
+            <input class="btn btn-outline-success" type="submit" value="Выход"/>
           </form>
         </a>
       </div>
@@ -46,8 +46,15 @@
           <a class="nav-link" href="/file/{fileName}" th:href="@{'/file/' + ${file}}">Загрузить</a>
         </form>
         <form th:action="files" method="get">
-          <a class="nav-link" href="/fileDelete/{fileName}" th:href="@{'/fileDelete/'+${file}}">Удалить</a>
+          <a class="nav-link" href="#" th:atribute = "${file}" onclick="confirmDeleteFile(event, this.getAttribute('atribute'))">Удалить</a>
         </form>
+        <a class="nav-link" href="#" th:data-access-form="${file}" onclick="showAccessForm(event, this.getAttribute('data-access-form'))">Предоставить доступ</a>
+        <div th:id="'accessFormContainer-'+${file}" style="display: none;">
+          <form th:action="@{'/filesAccessVersion/' + ${file}}" method="post">
+            <input type="text" name="username" placeholder="Имя пользователя">
+            <button type="submit" class="btn btn-outline-success" th:formaction="'/filesAccessVersion/' + ${file}">Подтвердить</button>
+          </form>
+        </div>
       </div>
 
     </div>
@@ -73,6 +80,27 @@
       } else {
         listItem.style.display = "none";
       }
+    }
+  }
+</script>
+<script>
+  function showAccessForm(event, formId) {
+    event.preventDefault();
+    var formContainer = document.getElementById('accessFormContainer-' + formId);
+    if (formContainer.style.display === 'none') {
+      formContainer.style.display = 'block';
+    } else {
+      formContainer.style.display = 'none';
+    }
+  }
+</script>
+<script>
+  function confirmDeleteFile(event, fileName) {
+    event.preventDefault(); // Отменить стандартное действие ссылки
+
+    if (confirm('Вы уверены, что хотите удалить файл "' + fileName + '"?')) {
+      // Если пользователь нажал "ОК", выполнить удаление
+      window.location.href = '/fileDelete/' + fileName;
     }
   }
 </script>

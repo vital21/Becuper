@@ -25,12 +25,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class FileVidController {
@@ -40,7 +41,7 @@ public class FileVidController {
     public String getFileList(Model model, @AuthenticationPrincipal User user,HttpSession session) {
         File folder = new File(UPLOAD_DIR+"/"+user.getUsername()+"/Files");
         List<String> files = Arrays.asList(folder.list());
-        model.addAttribute("files", files);
+
         File dirFolder = new File(UPLOAD_DIR+"/"+user.getUsername()+"/Dir");
         List<String> dirs = Arrays.asList(dirFolder.list());
         if(user.getRoles().stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"))){
@@ -49,7 +50,31 @@ public class FileVidController {
         else {
             model.addAttribute("isAdmin",false);
         }
+        List<String> fileDate=new ArrayList<>();
+        List<String> folderDate=new ArrayList<>();
+        List<Long> fileSize= new ArrayList<>();
+        List<Long> folderSize = new ArrayList<>();
+        File[] folders = dirFolder.listFiles();
+        File[] fileses = folder.listFiles();
+        for(File i : fileses){
+            fileDate.add(dateFile(i));
+            fileSize.add(folderSize(i)/1024);
+        }
+        for(File i : folders){
+            folderDate.add(dateFile(i));
+            folderSize.add(folderSize(i)/1024);
+        }
+        String hash = generateDirectoryHash(UPLOAD_DIR+"/"+user.getUsername());
+        if(user.getSecurityHes().contains(hash)) {
+            model.addAttribute("prov",true);
+        }
+        else model.addAttribute("prov",false);
+        model.addAttribute("files", files);
         model.addAttribute("dirs",dirs);
+        model.addAttribute("folderDate",folderDate);
+        model.addAttribute("fileDate",fileDate);
+        model.addAttribute("folderSize",folderSize);
+        model.addAttribute("fileSize",fileSize);
         model.addAttribute("path",UPLOAD_DIRECTORIES + "/" + user.getUsername() + "/Dir");
         session.setAttribute("uploadDirectory", UPLOAD_DIRECTORIES + "/" + user.getUsername() + "/Dir");
         return "file-list";
@@ -219,6 +244,89 @@ public class FileVidController {
         Collections.sort(files, Comparator.reverseOrder());
         return files.get(0);
     }
+    private String dateFile(File file){
+        if (file.exists()) {
+            try {
+                BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                FileTime creationTime = attrs.creationTime();
+                Date creationDate = new Date(creationTime.toMillis());
+
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                String formattedDate = dateFormat.format(creationDate);
+                return formattedDate;
+            } catch (Exception e) {
+                System.out.println("Ошибка при получении даты создания файла: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Файл не существует.");
+            return "Нет информации по файлу";
+        }
+        return "Нет информации";
+    }
+    private long folderSize(File file) {
+        if (file.exists()) {
+            if (file.isFile()) {
+                return file.length();
+            } else if (file.isDirectory()) {
+                long size = 0;
+                File[] files = file.listFiles();
+                if (files != null) {
+                    for (File f : files) {
+                        if (f.isFile()) {
+                            size += f.length();
+                        } else if (f.isDirectory()) {
+                            size += folderSize(f);
+                        }
+                    }
+                }
+                return  size ;
+            }
+        } else {
+            System.out.println("Файл или папка не существует.");
+        }
+        return 0;
+    }
+    public static String generateDirectoryHash(String directoryPath) {
+        StringBuilder sb = new StringBuilder();
+        traverseDirectory(new File(directoryPath), sb);
+        String directoryString = sb.toString();
+
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(directoryString.getBytes());
+
+            StringBuilder hashStringBuilder = new StringBuilder();
+            for (byte hashByte : hashBytes) {
+                String hex = Integer.toHexString(0xff & hashByte);
+                if (hex.length() == 1) hashStringBuilder.append('0');
+                hashStringBuilder.append(hex);
+            }
+
+            return hashStringBuilder.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    private static void traverseDirectory(File directory, StringBuilder sb) {
+        if (directory.isDirectory()) {
+            sb.append(directory.getName()).append("\n");
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    traverseDirectory(file, sb);
+                }
+            }
+        } else {
+            sb.append(directory.getName()).append("\n");
+        }
+    }
+
+
+
+
+
 
 
 
